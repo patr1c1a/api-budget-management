@@ -1,0 +1,4 @@
+api/__pycache__/
+my-venv/
+.idea/
+.env
