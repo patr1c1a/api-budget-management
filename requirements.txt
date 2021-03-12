@@ -1,0 +1,5 @@
+Flask~=1.1.2
+Flask-RESTful==0.3.8
+Flask-PyMongo==2.3.0
+bson==0.5.10
+dnspython==2.1.0
