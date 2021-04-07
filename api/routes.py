@@ -1,5 +1,7 @@
 from flask_restful import Api
 
+from api.controllers import MessageResource
+
 
 def register_routes(api: Api):
     """
@@ -13,3 +15,4 @@ def register_routes(api: Api):
     api.add_resource(OperationCollection, "/operations", endpoint="operations")
     api.add_resource(OperationResource, "/operation",
                      "/operation/<string:_id>", endpoint="operation")
+    api.add_resource(MessageResource, "/message", endpoint="message")

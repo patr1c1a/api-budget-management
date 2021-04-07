@@ -3,3 +3,6 @@ Flask-RESTful==0.3.8
 Flask-PyMongo==2.3.0
 bson==0.5.10
 dnspython==2.1.0
+
+pika==1.2.0
+pika-stubs==0.1.3

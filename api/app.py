@@ -1,3 +1,5 @@
+import logging
+
 from flask import Flask
 from flask_restful import Api
 
@@ -7,6 +9,11 @@ from api.routes import register_routes
 app = Flask(__name__)
 app.config.from_pyfile('../.env')
 api = Api(app)
+
+logging.basicConfig(#filename='record.log',
+                    level=logging.INFO,
+                    format=f'%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
+
 
 register_extensions(app)
 

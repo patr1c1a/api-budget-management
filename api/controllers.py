@@ -1,10 +1,11 @@
 import json
+from datetime import time, datetime
 
 from bson import ObjectId
 from flask import request, make_response, jsonify
 from flask_restful import Resource
 
-from api.extensions import pymongo
+from api.extensions import pymongo, pub
 from api.operation_service import OperationService
 
 db = pymongo.db
@@ -121,3 +122,20 @@ class OperationResource(Resource):
         if result.matched_count == 0:
             return {"message": "Id not found"}
         return {"message": "Operation modified successfully"}
+
+
+class MessageResource(Resource):
+    def post(self):
+        """
+        Create new operation
+        """
+
+        args = json.loads(request.data)
+        new_operation = {
+            "date": str(datetime.now()),
+            "message": args
+        }
+        message = json.dumps(new_operation)
+        pub.pub(message)
+        return make_response(new_operation, 201)
+
