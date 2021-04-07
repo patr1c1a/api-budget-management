@@ -31,9 +31,8 @@ class OperationService:
             results_filter["amount"] = {comparison_op: float(results_filter["amount"])}
             del results_filter["comparison"]
         if "partial_description" in results_filter:
-            results_filter["description"] = {"description": {
-                "$regex": results_filter["partial_description"],
-                "$options": "i"}}
+            results_filter["description"] = {"$regex": results_filter["partial_description"],
+                                             "$options": "i"}
             del results_filter["partial_description"]
         return results_filter
 

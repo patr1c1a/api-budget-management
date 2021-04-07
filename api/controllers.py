@@ -44,7 +44,7 @@ class OperationCollection(Resource):
             results_filter["amount"] = args["amount"]
             results_filter["comparison"] = args["comparison"]
         if "partial_description" in args:
-            results_filter["description"] = args["partial_description"]
+            results_filter["partial_description"] = args["partial_description"]
         return results_filter
 
 
