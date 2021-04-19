@@ -38,31 +38,13 @@ class OperationCollection(Resource):
             results_filter["category"] = args["category"]
         if "date" in args:
             results_filter["date"] = args["date"]
-        if all(key in args for key in ("amount", "comparison")):
+        if all(parameter in args for parameter in ("amount", "comparison")):
             if not args["comparison"] in ("higher", "lower"):
-                raise Exception("Wrong comparison operator. "
-                                               "It should be 'higher' or "
-                                               "'lower'.")
-            comparison_op = "$gte" if args["comparison"] == "higher" else\
-                "$lte"
-            results_filter["amount"] = {comparison_op: float(args["amount"])}
-        if "partial_description" in args:  # FIXME revisar
-            results_filter["description"] = {"description": {
-                "$regex": args["partial_description"],
-                "$options": "i"}
-            }
-            '''
-            # the following code used to work before refactoring:
-            if "partial_description" in args:
-                results = []
-                for document in db.operations.find({"description": {
-                    "$regex": args["partial_description"],
-                    "$options": "i"}
-                }):
-                    document['_id'] = str(document['_id'])
-                    results.append(document)
-                return results, 200
-            '''
+                raise Exception("Wrong comparison operator. It should be 'higher' or 'lower'.")
+            results_filter["amount"] = args["amount"]
+            results_filter["comparison"] = args["comparison"]
+        if "partial_description" in args:
+            results_filter["description"] = args["partial_description"]
         return results_filter
 
 

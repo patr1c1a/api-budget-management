@@ -11,6 +11,7 @@ class OperationService:
         :param dict results_filter: filters from url parameters.
         :return: list with all documents found in Operations collection.
         """
+        results_filter = self.parse_filters(results_filter)
         results = []
         for document in db.operations.find(results_filter):
             document['_id'] = str(document['_id'])
@@ -18,6 +19,23 @@ class OperationService:
             del(document['_id'])
             results.append(document)
         return results
+
+    def parse_filters(self, results_filter):
+        """
+        Converts specific filters into aggregations understandable by MongoDB
+        :param dict results_filter: raw parameters captured from url.
+        :return: dict with the specific filters to be used in a MongoDB query
+        """
+        if "amount" in results_filter:
+            comparison_op = "$gte" if results_filter["comparison"] == "higher" else "$lte"
+            results_filter["amount"] = {comparison_op: float(results_filter["amount"])}
+            del results_filter["comparison"]
+        if "partial_description" in results_filter:
+            results_filter["description"] = {"description": {
+                "$regex": results_filter["partial_description"],
+                "$options": "i"}}
+            del results_filter["partial_description"]
+        return results_filter
 
     def find_operation(self, operation_id):
         """
