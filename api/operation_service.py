@@ -1,4 +1,5 @@
 from api.extensions import pymongo
+from bson import ObjectId
 
 db = pymongo.db
 
@@ -20,7 +21,7 @@ class OperationService:
             results.append(document)
         return results
 
-    def parse_filters(self, results_filter):
+    def parse_filters(self, results_filter: dict):
         """
         Converts specific filters into aggregations understandable by MongoDB
         :param dict results_filter: raw parameters captured from url.
@@ -36,17 +37,18 @@ class OperationService:
             del results_filter["partial_description"]
         return results_filter
 
-    def find_operation(self, operation_id):
+    def find_operation(self, operation_id: ObjectId):
         """
         Retrieves an operation from the Operations collection based on its id.
         :param ObjectId operation_id: id of operation to be retrieved.
         :return: dict containing the requested operation or NoneType if not found.
         """
-        operation = db.operations.find_one_or_404({"_id": operation_id})
-        operation["_id"] = str(operation["_id"])
+        operation = db.operations.find_one({"_id": operation_id})
+        if operation:
+            operation["_id"] = str(operation["_id"])
         return operation
 
-    def create_operation(self, new_operation):
+    def create_operation(self, new_operation: dict):
         """
         Adds a new operation to the Operations collection.
         :param dict new_operation: operation to be added.
@@ -55,7 +57,7 @@ class OperationService:
         result = db.operations.insert_one(new_operation)
         return str(result.inserted_id)
 
-    def delete_operation(self, operation_id):
+    def delete_operation(self, operation_id: ObjectId):
         """
         Deletes an operation from the Operations collection based on its id.
         :param ObjectId operation_id: id of operation to be deleted.
@@ -64,7 +66,7 @@ class OperationService:
         result = db.operations.delete_one({"_id": operation_id})
         return result.deleted_count
 
-    def update_operation(self, operation_id, modified_operation):
+    def update_operation(self, operation_id: ObjectId, modified_operation: dict):
         """
         Update operation specified by id.
         :param ObjectId operation_id: id of operation that will be modified.

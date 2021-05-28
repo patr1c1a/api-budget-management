@@ -2,6 +2,7 @@ import json
 from bson import ObjectId
 from flask import request, make_response
 from flask_restful import Resource
+from http import HTTPStatus
 from api.extensions import pymongo
 from api.operation_service import OperationService
 
@@ -21,9 +22,9 @@ class OperationCollection(Resource):
         try:
             results_filter = self.parse_find_parameters(args)
         except Exception as exp:
-            return make_response({"message": str(exp)}, 400)
+            return make_response({"message": str(exp)}, HTTPStatus.BAD_REQUEST)
         results = OperationService().find_operations(results_filter)
-        return results, 200
+        return results, HTTPStatus.OK
 
     def parse_find_parameters(self, args: dict):
         """
@@ -50,14 +51,16 @@ class OperationCollection(Resource):
 
 class OperationResource(Resource):
 
-    def get(self, _id):
+    def get(self, _id: str):
         """
         Retrieve single operation matching id.
-        :param _id: operation id to be found.
+        :param str _id: operation id to be found.
         :return: tuple with operation and response code 200.
         """
         result = OperationService().find_operation(ObjectId(_id))
-        return make_response(result, 200)
+        if result:
+            return make_response(result, HTTPStatus.OK)
+        return {"message": "Id not found"}, HTTPStatus.NOT_FOUND
 
     def post(self):
         """
@@ -73,24 +76,24 @@ class OperationResource(Resource):
             "category": args["category"]
         }
         new_op_id = OperationService().create_operation(new_operation)
-        return new_op_id, 201
+        return new_op_id, HTTPStatus.CREATED
 
-    def delete(self, _id):
+    def delete(self, _id: str):
         """
         Remove operation specified by id.
-        :param _id: operation id to be deleted.
+        :param str _id: operation id to be deleted.
         :return: tuple with message detailing result and status code (200 or 404).
         """
         count = OperationService().delete_operation(ObjectId(_id))
         if count == 0:
-            return {"message": "Id not found"}, 404
-        return {"message": "Operation deleted successfully"}, 200
+            return {"message": "Id not found"}, HTTPStatus.NOT_FOUND
+        return {"message": "Operation deleted successfully"}, HTTPStatus.OK
 
-    def patch(self, _id):
+    def patch(self, _id: str):
         """
         Update operation specified by id. Type cannot be changed.
         :param str _id: operation id to be modified.
-        :return: tuple with message detailing result and status code (204 or 404).
+        :return: tuple with message detailing result and status code (200 or 404).
         """
         args = json.loads(request.data)
         modified_operation = {
@@ -101,5 +104,5 @@ class OperationResource(Resource):
         }
         count = OperationService().update_operation(ObjectId(_id), modified_operation)
         if count == 0:
-            return {"message": "Id not found"}, 404
-        return {"message": "Operation modified successfully"}, 204
+            return {"message": "Id not found"}, HTTPStatus.NOT_FOUND
+        return {"message": "Operation modified successfully"}, HTTPStatus.OK
